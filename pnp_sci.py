@@ -13,8 +13,8 @@ from utils import (A_, At_, psnr)
 if skimage.__version__ < '0.18':
     from skimage.measure import (compare_psnr, compare_ssim)
 else: # skimage.measure deprecated in version 0.18 ( -> skimage.metrics )
-    import skimage.metrics.peak_signal_noise_ratio as compare_psnr
-    import skimage.metrics.structural_similarity   as compare_ssim
+    from skimage.metrics import peak_signal_noise_ratio as compare_psnr
+    from skimage.metrics import structural_similarity   as compare_ssim
 
 
 def gap_denoise_bayer(y_bayer, Phi_bayer, _lambda=1, accelerate=True, 
@@ -161,8 +161,8 @@ def gap_denoise_bayer(y_bayer, Phi_bayer, _lambda=1, accelerate=True,
             # switch denoiser 
             if denoiser.lower() == 'tv': # total variation (TV) denoising
                 xall_vch = xall.reshape([nrow//2, ncol//2, nmask*4])
-                xall_vch = denoise_tv_chambolle(xall_vch, tv_weight, n_iter_max=tv_iter_max, 
-                                        multichannel=multichannel)
+                xall_vch = denoise_tv_chambolle(xall_vch, tv_weight, max_num_iter=tv_iter_max,
+                                        channel_axis=multichannel)
                 xall = xall_vch.reshape([nrow//2, ncol//2, nmask, 4])
                 # xall = xall.clip(0., 1.) # [0,1]
             elif denoiser.lower() == 'wavelet': # wavelet denoising
